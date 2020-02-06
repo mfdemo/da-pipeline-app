@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        jenkinsUrl = env.JENKINS_URL
-        buildUrl = env.BUILD_URL
+        jenkinsUrl = "env.JENKINS_URL"
+        buildUrl = "env.BUILD_URL"
 		appName = "DA Pipeline App"
 		appVersion = "1.0"
 		daSitename = "octane.mfdemouk.com"
