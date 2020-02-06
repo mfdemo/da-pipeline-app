@@ -57,10 +57,10 @@ pipeline {
 						addStatus: false, 
 						statusName: 'BUILT',
 						deploy: false, 
-						deployIf: ''
+						deployIf: '',
 						deployUpdateJobStatus: true,
 						deployApp: '', 
-						deployEnv: '', , 
+						deployEnv: '',
 						deployProc: '', 
 						deployProps: '' 
                 }

@@ -28,27 +28,27 @@ import org.junit.Test;
 
 public class SomeTest extends Base {
 
-    @Test public void test1() {
+    @Test public void daPipelineTest1() {
         run();
     }
 
-    @Test public void test2() {
+    @Test public void daPipelineTest2() {
         run();
     }
 
-    @Test public void test3() {
+    @Test public void daPipelineTest3() {
         run();
     }
 
-    @Test public void test4() {
+    @Test public void daPipelineTest4() {
         run();
     }
 
-    @Test public void test5() {
+    @Test public void daPipelineTest5() {
         run();
     }
 
-    @Test public void test6() {
+    @Test public void daPipelineTest6() {
         run();
     }
 
