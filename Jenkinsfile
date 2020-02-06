@@ -37,8 +37,7 @@ pipeline {
                     archiveArtifacts 'target/*.war'
 					
 					// Set component version propeties
-					def verProperties =
-					"""job.url=${env.BUILD_URL}
+					def verProperties = """job.url=${env.BUILD_URL}
 					jenkins.url=${env.JENKINS_URL}
 					git.commit.id=${gitCommitId}
 					issueIds=${issueIds}"""
@@ -62,7 +61,13 @@ pipeline {
 						deployApp: '', 
 						deployEnv: '',
 						deployProc: '', 
-						deployProps: '' 
+						deployProps: '',
+                        runProcess: false,
+						processIf: '',
+						processName: '',
+						processProps: '',
+						processUpdateJobStatus: false,
+						resourceName: ''
                 }
             }
 
