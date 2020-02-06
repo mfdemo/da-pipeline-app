@@ -35,13 +35,7 @@ pipeline {
                 success {
                     junit '**/target/surefire-reports/TEST-*.xml'
                     archiveArtifacts 'target/*.war'
-					
-					// Set component version propeties
-					def verProperties = """job.url=${env.BUILD_URL}
-					jenkins.url=${env.JENKINS_URL}
-					git.commit.id=${gitCommitId}
-					issueIds=${issueIds}"""
-		
+
 					// Upload artefacts into DA
 					daPublish siteName: "${daSitename}",
 						component: "${daComponentName}", 
@@ -51,7 +45,10 @@ pipeline {
 						fileIncludePatterns: '${daComponentName}.jar',
 						fileExcludePatterns: '''**/*tmp*
 							**/.git''',
-						versionProps: "${verProperties}",
+						versionProps: '''job.url=${env.BUILD_URL}
+                            jenkins.url=${env.JENKINS_URL}
+                            git.commit.id=${gitCommitId}
+                            issueIds=${issueIds}''',
 						skip: false,
 						addStatus: false, 
 						statusName: 'BUILT',
