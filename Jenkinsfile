@@ -36,7 +36,7 @@ pipeline {
                 // failed, record the com results and archive the jar file.
                 success {
                     junit '**/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'target/*.war'
+                    archiveArtifacts 'target/*.jar'
 
 					// Upload artefacts into DA
 					daPublish siteName: "${daSitename}",
@@ -44,7 +44,7 @@ pipeline {
 						baseDir: "${WORKSPACE}", 
 						directoryOffset: "target",
 						versionName: "${appVersion}-${BUILD_NUMBER}",
-						fileIncludePatterns: "${daComponentName}.war",
+						fileIncludePatterns: "${daComponentName}.jar",
 						fileExcludePatterns: """**/*tmp*
 							**/.git""",
 						versionProps: """job.url=${buildUrl}
