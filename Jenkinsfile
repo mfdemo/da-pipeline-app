@@ -10,7 +10,6 @@ pipeline {
 		daComponentName = "da-pipeline-app"
         gitCommitId = ""
 		issuesIds = ""
-		
     }
 
     tools {
@@ -49,8 +48,8 @@ pipeline {
 							**/.git""",
 						versionProps: """job.url=${buildUrl}
                             jenkins.url=${jenkinsUrl}
-                            git.commit.id=${gitCommitId}
-                            issueIds=${issueIds}""",
+                            git.commit.id=
+                            issueIds=""",
 						skip: false,
 						addStatus: false, 
 						statusName: "BUILT",
