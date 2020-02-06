@@ -2,6 +2,8 @@ pipeline {
     agent any
 
     environment {
+        jenkinsUrl = env.JENKINS_URL
+        buildUrl = env.BUILD_URL
 		appName = "DA Pipeline App"
 		appVersion = "1.0"
 		daSitename = "octane.mfdemouk.com"
@@ -20,7 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Get some code from a GitHub repository
-                git 'https://github.com/mfdemo/simple-secure-app.git'
+                git 'https://github.com/mfdemo/da-pipeline-app.git'
 
                 // Run Maven on a Unix agent.
                 //sh "mvn -Dmaven.com.failure.ignore=true clean package"
@@ -40,18 +42,18 @@ pipeline {
 					daPublish siteName: "${daSitename}",
 						component: "${daComponentName}", 
 						baseDir: "${WORKSPACE}", 
-						directoryOffset: 'target', 
-						versionName: '${appVersion}-${BUILD_NUMBER}', 
-						fileIncludePatterns: '${daComponentName}.jar',
-						fileExcludePatterns: '''**/*tmp*
-							**/.git''',
-						versionProps: '''job.url=${env.BUILD_URL}
-                            jenkins.url=${env.JENKINS_URL}
+						directoryOffset: "target",
+						versionName: "${appVersion}-${BUILD_NUMBER}",
+						fileIncludePatterns: "${daComponentName}.war",
+						fileExcludePatterns: """**/*tmp*
+							**/.git""",
+						versionProps: """job.url=${buildUrl}
+                            jenkins.url=${jenkinsUrl}
                             git.commit.id=${gitCommitId}
-                            issueIds=${issueIds}''',
+                            issueIds=${issueIds}""",
 						skip: false,
 						addStatus: false, 
-						statusName: 'BUILT',
+						statusName: "BUILT",
 						deploy: false, 
 						deployIf: '',
 						deployUpdateJobStatus: true,
