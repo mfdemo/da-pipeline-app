@@ -23,6 +23,18 @@ pipeline {
                 // Get some code from a GitHub repository
                 git 'https://github.com/mfdemo/da-pipeline-app.git'
 
+                script {}
+                    // Get Git commit details
+                    //sh "git rev-parse HEAD > .git\commit-id"
+                    bat(/git rev-parse HEAD > .git\commit-id/)
+                    env.GIT_COMMIT_ID = readFile('.git/commit-id').trim()
+                    env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${gitCommitId}", returnStdout: true).trim()
+                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${gitCommitId}", returnStdout: true).trim()
+                }
+
+                println "Git commit id: ${env.GIT_COMMIT_ID}"
+                println "Git commit author: ${env.GIT_COMMIT_AUTHOR}"
+
                 // Run Maven on a Unix agent.
                 //sh "mvn -Dmaven.com.failure.ignore=true clean package"
 
@@ -37,38 +49,43 @@ pipeline {
                     junit '**/target/surefire-reports/TEST-*.xml'
                     archiveArtifacts 'target/*.jar'
 
-					// Upload artefacts into DA
-					daPublish siteName: "${daSitename}",
-						component: "${daComponentName}", 
-						baseDir: "${WORKSPACE}", 
-						directoryOffset: "target",
-						versionName: "${appVersion}-${BUILD_NUMBER}",
-						fileIncludePatterns: "${daComponentName}.jar",
-						fileExcludePatterns: """**/*tmp*
-							**/.git""",
-						versionProps: """job.url=${buildUrl}
-                            jenkins.url=${jenkinsUrl}
-                            git.commit.id=
-                            issueIds=""",
-						skip: false,
-						addStatus: false, 
-						statusName: "BUILT",
-						deploy: false, 
-						deployIf: '',
-						deployUpdateJobStatus: true,
-						deployApp: '', 
-						deployEnv: '',
-						deployProc: '', 
-						deployProps: '',
-                        runProcess: false,
-						processIf: '',
-						processName: '',
-						processProps: '',
-						processUpdateJobStatus: false,
-						resourceName: ''
                 }
             }
 
+        }
+
+        stage('Publish') {
+            steps {
+                // Upload artefacts into DA
+                daPublish siteName: "${daSitename}",
+                    component: "${daComponentName}",
+                    baseDir: "${WORKSPACE}",
+                    directoryOffset: "target",
+                    versionName: "${appVersion}-${BUILD_NUMBER}",
+                    fileIncludePatterns: "${daComponentName}.jar",
+                    fileExcludePatterns: """**/*tmp*
+                        **/.git""",
+                    versionProps: """job.url=${env.BUILD_URL}
+                        jenkins.url=${env.JENKINS_URL}
+                        git.commit.id=${env.GIT_COMMIT_ID}
+                        issueIds=""",
+                    skip: false,
+                    addStatus: false,
+                    statusName: "BUILT",
+                    deploy: false,
+                    deployIf: '',
+                    deployUpdateJobStatus: true,
+                    deployApp: '',
+                    deployEnv: '',
+                    deployProc: '',
+                    deployProps: '',
+                    runProcess: false,
+                    processIf: '',
+                    processName: '',
+                    processProps: '',
+                    processUpdateJobStatus: false,
+                    resourceName: ''
+            }
         }
 
         stage('Integration') {
