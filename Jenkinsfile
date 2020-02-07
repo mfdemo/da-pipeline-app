@@ -23,7 +23,7 @@ pipeline {
                 // Get some code from a GitHub repository
                 git 'https://github.com/mfdemo/da-pipeline-app.git'
 
-                script {}
+                script {
                     // Get Git commit details
                     //sh "git rev-parse HEAD > .git\commit-id"
                     bat(/git rev-parse HEAD > .git\commit-id/)
@@ -70,11 +70,11 @@ pipeline {
                         git.commit.id=${env.GIT_COMMIT_ID}
                         issueIds=""",
                     skip: false,
-                    addStatus: false,
+                    addStatus: true,
                     statusName: "BUILT",
                     deploy: false,
                     deployIf: '',
-                    deployUpdateJobStatus: true,
+                    deployUpdateJobStatus: false,
                     deployApp: '',
                     deployEnv: '',
                     deployProc: '',
