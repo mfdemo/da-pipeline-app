@@ -26,29 +26,9 @@ package com.microfocus.example;
 
 import org.junit.Test;
 
-public class SomeTest extends Base {
+public class DAPipelineAppOtherTest extends Base {
 
-    @Test public void daPipelineTest1() {
-        run();
-    }
-
-    @Test public void daPipelineTest2() {
-        run();
-    }
-
-    @Test public void daPipelineTest3() {
-        run();
-    }
-
-    @Test public void daPipelineTest4() {
-        run();
-    }
-
-    @Test public void daPipelineTest5() {
-        run();
-    }
-
-    @Test public void daPipelineTest6() {
+    @Test public void daPipelineTest() {
         run();
     }
 

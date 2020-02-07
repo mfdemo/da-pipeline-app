@@ -43,8 +43,8 @@ pipeline {
                 // If Maven was able to run the tests, even if some of the com
                 // failed, record the com results and archive the jar file.
                 success {
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'target/${env.COMPONENT_NAME}.jar'
+                    junit "**/target/surefire-reports/TEST-*.xml"
+                    archiveArtifacts "target/${env.COMPONENT_NAME}.jar"
                 }
             }
 
