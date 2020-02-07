@@ -88,7 +88,7 @@ issueIds=""",
             steps {
                 // Deploy the Application to the Integration environment using DA
                 daRunApplicationProcess siteName: "${env.DA_SITE_NAME}",
-                    applicationName: "$env.APP_NAME}",
+                    applicationName: "${env.APP_NAME}",
                     applicationProcessName: "${env.DA_DEPLOY_PROCESS}",
                     componentName: "${env.COMPONENT_NAME}",
                     versionName: "${env.APP_VER}-${BUILD_NUMBER}",
