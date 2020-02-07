@@ -7,6 +7,7 @@ pipeline {
 		APP_VER = "1.0"
 		COMPONENT_NAME = "da-pipeline-app"
 		DA_SITE_NAME = "octane.mfdemouk.com"
+		DA_DEPLOY_PROCESS = "Deploy"
     }
 
     tools {
@@ -22,11 +23,11 @@ pipeline {
 
                 script {
                     // Get Git commit details
-                    //sh "git rev-parse HEAD > .git\commit-id"
+                    //sh "git rev-parse HEAD > .git/commit-id"
                     bat(/git rev-parse HEAD > .git\commit-id/)
                     env.GIT_COMMIT_ID = readFile('.git/commit-id').trim()
-                    env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
-                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
+                    env.GIT_COMMIT_AUTHOR = bat(/git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}/).trim()
+                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: false).trim()
                 }
 
                 println "Git commit id: ${env.GIT_COMMIT_ID}"
@@ -66,7 +67,7 @@ git.commit.id=${env.GIT_COMMIT_ID}
 issueIds=""",
                     skip: false,
                     addStatus: true,
-                    statusName: "BUILT",
+                    statusName: "BUILT", // make sure this version status exists in DA
                     deploy: false,
                     deployIf: '',
                     deployUpdateJobStatus: false,
@@ -85,7 +86,38 @@ issueIds=""",
 
         stage('Integration') {
             steps {
-                println "Deploying to Integration"
+                // Deploy the Application to the Integration environment using DA
+                daRunApplicationProcess siteName: "${env.DA_SITE_NAME}",
+                    applicationName: "$env.APP_NAME}",
+                    applicationProcessName: "${env.DA_DEPLOY_PROCESS}",
+                    componentName: "${env.COMPONENT_NAME}",
+                    versionName: "${env.APP_VER}-${BUILD_NUMBER}",
+                    applicationProcessProperties: """job.url=${env.BUILD_URL}
+jenkins.url=${env.JENKINS_URL}
+git.commit.id=${env.GIT_COMMIT_ID}
+issueIds=""",
+                    environmentName: 'Integration',
+                    runApplicationProcessIf: '',
+                    updateJobStatus: true
+            }
+
+            post {
+                // If deployment successful add the version status "INTEGRATED"
+                success {
+                    daUpdateVersionStatus siteName: "${env.DA_SITE_NAME}",
+                        action: 'Add',
+                        componentName: "${env.COMPONENT_NAME}",
+                        versionName: "${env.APP_VER}-${BUILD_NUMBER}",
+                        statusName: 'INTEGRATED' // make sure this version status exists in DA
+                }
+                // If deployment failed add the version status "FAILED"
+                failure {
+                    daUpdateVersionStatus siteName: "${env.DA_SITE_NAME}",
+                        action: 'Add',
+                        componentName: "${env.COMPONENT_NAME}",
+                        versionName: "${env.APP_VER}-${BUILD_NUMBER}",
+                        statusName: 'FAILED' // make sure this version status exists in DA
+                }
             }
         }
 		
