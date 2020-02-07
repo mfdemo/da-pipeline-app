@@ -105,7 +105,7 @@ issueIds=""",
                 // If deployment successful add the version status "INTEGRATED"
                 success {
                     daUpdateVersionStatus siteName: "${env.DA_SITE_NAME}",
-                        action: 'ADD',
+                        action: '',
                         componentName: "${env.COMPONENT_NAME}",
                         versionName: "${env.APP_VER}-${BUILD_NUMBER}",
                         statusName: 'INTEGRATED' // make sure this version status exists in DA
@@ -113,7 +113,7 @@ issueIds=""",
                 // If deployment failed add the version status "FAILED"
                 failure {
                     daUpdateVersionStatus siteName: "${env.DA_SITE_NAME}",
-                        action: 'ADD',
+                        action: '',
                         componentName: "${env.COMPONENT_NAME}",
                         versionName: "${env.APP_VER}-${BUILD_NUMBER}",
                         statusName: 'FAILED' // make sure this version status exists in DA
