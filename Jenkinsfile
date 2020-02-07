@@ -2,14 +2,11 @@ pipeline {
     agent any
 
     environment {
-        jenkinsUrl = "env.JENKINS_URL"
-        buildUrl = "env.BUILD_URL"
-		appName = "DA Pipeline App"
-		appVersion = "1.0"
-		daSitename = "octane.mfdemouk.com"
-		daComponentName = "da-pipeline-app"
-        gitCommitId = ""
-		issuesIds = ""
+        GIT_REPO = "https://github.com/mfdemo/da-pipeline-app.git"
+		APP_NAME = "DA Pipeline App"
+		APP_VER = "1.0"
+		COMPONENT_NAME = "da-pipeline-app"
+		DA_SITE_NAME = "octane.mfdemouk.com"
     }
 
     tools {
@@ -21,15 +18,15 @@ pipeline {
         stage('Build') {
             steps {
                 // Get some code from a GitHub repository
-                git 'https://github.com/mfdemo/da-pipeline-app.git'
+                git "${env.GIT_REPO}"
 
                 script {
                     // Get Git commit details
                     //sh "git rev-parse HEAD > .git\commit-id"
                     bat(/git rev-parse HEAD > .git\commit-id/)
                     env.GIT_COMMIT_ID = readFile('.git/commit-id').trim()
-                    env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${gitCommitId}", returnStdout: true).trim()
-                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${gitCommitId}", returnStdout: true).trim()
+                    env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
+                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
                 }
 
                 println "Git commit id: ${env.GIT_COMMIT_ID}"
@@ -47,8 +44,7 @@ pipeline {
                 // failed, record the com results and archive the jar file.
                 success {
                     junit '**/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'target/*.jar'
-
+                    archiveArtifacts 'target/${env.COMPONENT_NAME}.jar'
                 }
             }
 
@@ -57,12 +53,12 @@ pipeline {
         stage('Publish') {
             steps {
                 // Upload artefacts into DA
-                daPublish siteName: "${daSitename}",
-                    component: "${daComponentName}",
+                daPublish siteName: "${env.DA_SITE_NAME}",
+                    component: "${env.COMPONENT_NAME}",
                     baseDir: "${WORKSPACE}",
                     directoryOffset: "target",
-                    versionName: "${appVersion}-${BUILD_NUMBER}",
-                    fileIncludePatterns: "${daComponentName}.jar",
+                    versionName: "${env.APP_VER}-${BUILD_NUMBER}",
+                    fileIncludePatterns: "${env.COMPONENT_NAME}.jar",
                     fileExcludePatterns: """**/*tmp*
                         **/.git""",
                     versionProps: """job.url=${env.BUILD_URL}
