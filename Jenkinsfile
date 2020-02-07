@@ -59,12 +59,11 @@ pipeline {
                     directoryOffset: "target",
                     versionName: "${env.APP_VER}-${BUILD_NUMBER}",
                     fileIncludePatterns: "${env.COMPONENT_NAME}.jar",
-                    fileExcludePatterns: """**/*tmp*
-                        **/.git""",
+                    fileExcludePatterns: """**/*tmp*\n**/.git""",
                     versionProps: """job.url=${env.BUILD_URL}
-                        jenkins.url=${env.JENKINS_URL}
-                        git.commit.id=${env.GIT_COMMIT_ID}
-                        issueIds=""",
+jenkins.url=${env.JENKINS_URL}
+git.commit.id=${env.GIT_COMMIT_ID}
+issueIds=""",
                     skip: false,
                     addStatus: true,
                     statusName: "BUILT",
