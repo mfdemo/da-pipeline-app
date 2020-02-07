@@ -26,8 +26,8 @@ pipeline {
                     //sh "git rev-parse HEAD > .git/commit-id"
                     bat(/git rev-parse HEAD > .git\commit-id/)
                     env.GIT_COMMIT_ID = readFile('.git/commit-id').trim()
-                    env.GIT_COMMIT_AUTHOR = bat(/git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}/).trim()
-                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: false).trim()
+                    env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
+                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
                 }
 
                 println "Git commit id: ${env.GIT_COMMIT_ID}"
