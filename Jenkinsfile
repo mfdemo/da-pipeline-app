@@ -70,7 +70,7 @@ pipeline {
                     versionProps: """job.url=${env.BUILD_URL}
 jenkins.url=${env.JENKINS_URL}
 git.commit.id=${env.GIT_COMMIT_ID}
-issueIds=""",
+issueIds=NONE""",
                     skip: false,
                     addStatus: true,
                     statusName: "BUILT", // make sure this version status exists in DA
@@ -103,7 +103,7 @@ issueIds=""",
                     applicationProcessProperties: """job.url=${env.BUILD_URL}
 jenkins.url=${env.JENKINS_URL}
 git.commit.id=${env.GIT_COMMIT_ID}
-issueIds=""",
+issueIds=NONE""",
                     environmentName: 'Integration',
                     runApplicationProcessIf: '',
                     updateJobStatus: true
