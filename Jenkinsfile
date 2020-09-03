@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         GIT_REPO = "https://github.com/mfdemo/da-pipeline-app.git"
-		APP_NAME = "DA Pipeline App"
-		APP_VER = "1.0"
-		COMPONENT_NAME = "da-pipeline-app"
-		DA_SITE_NAME = "octane.mfdemouk.com"
-		DA_DEPLOY_PROCESS = "Deploy"
+	APP_NAME = "DA Pipeline App"
+	APP_VER = "1.0"
+	COMPONENT_NAME = "da-pipeline-app"
+	DA_PROFILE_NAME = "ara.mfdemouk.com"
+	DA_DEPLOY_PROCESS = "Deploy"
     }
 
     tools {
@@ -23,8 +23,11 @@ pipeline {
 
                 script {
                     // Get Git commit details
-                    //sh "git rev-parse HEAD > .git/commit-id"
-                    bat(/git rev-parse HEAD > .git\commit-id/)
+		    if (isUnix()) {	
+                        sh "git rev-parse HEAD > .git/commit-id"
+		    } else {	    
+                        bat(/git rev-parse HEAD > .git\commit-id/)
+		    }	    
                     env.GIT_COMMIT_ID = readFile('.git/commit-id').trim()
                     env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
                     env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
@@ -33,11 +36,13 @@ pipeline {
                 println "Git commit id: ${env.GIT_COMMIT_ID}"
                 println "Git commit author: ${env.GIT_COMMIT_AUTHOR}"
 
-                // Run Maven on a Unix agent.
-                //sh "mvn -Dmaven.com.failure.ignore=true clean package"
-
-                // To run Maven on a Windows agent, use
-                bat "mvn -Dmaven.com.failure.ignore=true clean package"
+		if (isUnix()) {
+                    // Run Maven on a Unix agent.
+                    sh "mvn -Dmaven.com.failure.ignore=true clean package"
+		} else {
+                    // To run Maven on a Windows agent, use
+                    bat "mvn -Dmaven.com.failure.ignore=true clean package"
+		}	
             }
 
             post {
@@ -54,7 +59,7 @@ pipeline {
         stage('Publish') {
             steps {
                 // Upload artefacts into DA
-                daPublish siteName: "${env.DA_SITE_NAME}",
+                daPublish siteName: "${env.DA_PROFILE_NAME}",
                     component: "${env.COMPONENT_NAME}",
                     baseDir: "${WORKSPACE}",
                     directoryOffset: "target",
@@ -87,7 +92,7 @@ issueIds=""",
         stage('Integration') {
             steps {
                 // Deploy the Application to the Integration environment using DA
-                daRunApplicationProcess siteName: "${env.DA_SITE_NAME}",
+                daRunApplicationProcess siteName: "${env.DA_PROFILE_NAME}",
                     applicationName: "${env.APP_NAME}",
                     applicationProcessName: "${env.DA_DEPLOY_PROCESS}",
                     componentName: "${env.COMPONENT_NAME}",
@@ -104,7 +109,7 @@ issueIds=""",
             post {
                 // If deployment successful add the version status "INTEGRATED"
                 success {
-                    daUpdateVersionStatus siteName: "${env.DA_SITE_NAME}",
+                    daUpdateVersionStatus siteName: "${env.DA_PROFILE_NAME}",
                         action: '',
                         componentName: "${env.COMPONENT_NAME}",
                         versionName: "${env.APP_VER}-${BUILD_NUMBER}",
@@ -112,7 +117,7 @@ issueIds=""",
                 }
                 // If deployment failed add the version status "FAILED"
                 failure {
-                    daUpdateVersionStatus siteName: "${env.DA_SITE_NAME}",
+                    daUpdateVersionStatus siteName: "${env.DA_PROFILE_NAME}",
                         action: '',
                         componentName: "${env.COMPONENT_NAME}",
                         versionName: "${env.APP_VER}-${BUILD_NUMBER}",
