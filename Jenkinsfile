@@ -29,11 +29,11 @@ pipeline {
                         bat(/git rev-parse HEAD > .git\commit-id/)
 		    }	    
                     env.GIT_COMMIT_ID = readFile('.git/commit-id').trim()
-                    env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
-                    env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
+                    //env.GIT_COMMIT_AUTHOR = bat(script: "git log -1 --pretty=%%an ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
+                    //env.GIT_COMMIT_MSG = bat(script: "git log -1 --pretty=%%B ${env.GIT_COMMIT_ID}", returnStdout: true).trim()
 
                     println "Git commit id: ${env.GIT_COMMIT_ID}"
-                    println "Git commit author: ${env.GIT_COMMIT_AUTHOR}"
+                    //println "Git commit author: ${env.GIT_COMMIT_AUTHOR}"
 
 		    if (isUnix()) {
                         // Run Maven on a Unix agent.
