@@ -59,7 +59,8 @@ pipeline {
         stage('Publish') {
             steps {
                 // Upload artefacts into DA
-                daPublish siteName: "${env.DA_PROFILE_NAME}",
+		step([$class: 'SerenaDAPublisher',    
+                    siteName: "${env.DA_PROFILE_NAME}",
                     component: "${env.COMPONENT_NAME}",
                     baseDir: "${WORKSPACE}",
                     directoryOffset: "target",
@@ -86,13 +87,15 @@ issueIds=""",
                     processProps: '',
                     processUpdateJobStatus: false,
                     resourceName: ''
+		])      
             }
         }
 
         stage('Integration') {
             steps {
                 // Deploy the Application to the Integration environment using DA
-                daRunApplicationProcess siteName: "${env.DA_PROFILE_NAME}",
+                step([$class: 'RunApplicationProcessNotifier', 
+		    siteName: "${env.DA_PROFILE_NAME}",
                     applicationName: "${env.APP_NAME}",
                     applicationProcessName: "${env.DA_DEPLOY_PROCESS}",
                     componentName: "${env.COMPONENT_NAME}",
@@ -104,24 +107,29 @@ issueIds=""",
                     environmentName: 'Integration',
                     runApplicationProcessIf: '',
                     updateJobStatus: true
+		])      
             }
 
             post {
                 // If deployment successful add the version status "INTEGRATED"
                 success {
-                    daUpdateVersionStatus siteName: "${env.DA_PROFILE_NAME}",
-                        action: '',
+                    step([$class: 'UpdateComponentVersionStatusNotifier',
+			siteName: "${env.DA_PROFILE_NAME}",
+                        action: 'Add',
                         componentName: "${env.COMPONENT_NAME}",
                         versionName: "${env.APP_VER}-${BUILD_NUMBER}",
                         statusName: 'INTEGRATED' // make sure this version status exists in DA
+		    ])  
                 }
                 // If deployment failed add the version status "FAILED"
                 failure {
-                    daUpdateVersionStatus siteName: "${env.DA_PROFILE_NAME}",
-                        action: '',
+                    step([$class: 'UpdateComponentVersionStatusNotifier',
+			siteName: "${env.DA_PROFILE_NAME}",
+                        action: 'Add',
                         componentName: "${env.COMPONENT_NAME}",
                         versionName: "${env.APP_VER}-${BUILD_NUMBER}",
                         statusName: 'FAILED' // make sure this version status exists in DA
+		    ])	  
                 }
             }
         }
